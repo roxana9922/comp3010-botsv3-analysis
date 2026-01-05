@@ -20,7 +20,17 @@ The scope of this report is limited to the AWS-focused 200-level question set fr
 This investigation assumes a functional Splunk deployment with the BOTSv3 dataset ingested and indexed. All work reflects practical SOC analysis and adheres to professional forensic reporting standards.
 
 
+3. Methodology and SPL Investigation Approach
 
+The investigation followed a structured, hypothesis-driven SOC analysis workflow. Rather than relying on single queries, each finding was validated through iterative SPL refinement and cross-source correlation.
+
+For AWS-related analysis, CloudTrail logs (aws:cloudtrail) were used as the primary source to identify IAM activity, API calls without MFA, and S3 access control changes. SPL searches were constructed to filter by eventName, userIdentity fields, and error codes to distinguish successful versus unsuccessful actions. Where necessary, console login events were excluded to reduce noise and focus on programmatic access risks.
+
+S3 access logs (aws:s3:accesslogs) were then correlated with CloudTrail findings to confirm whether misconfigurations led to real data exposure, such as successful object uploads during periods of public access. HTTP status codes and request types were used to validate outcomes.
+
+Endpoint analysis leveraged winhostmon and hardware-related source types to identify host-level anomalies. Aggregation functions and comparative statistics were applied to detect deviations in operating system editions across endpoints, allowing identification of an outlier host by FQDN.
+
+This approach reflects professional SOC investigation practice, where alerts are treated as starting points and conclusions are only drawn after corroborating evidence across multiple telemetry sources.
 2. SOC Roles & Incident Handling Reflection
 
 Security Operations Centres (SOCs) operate through a tiered model that enables efficient detection, investigation and escalation of security events. In a real environment—mirrored by the BOTSv3 scenario—each SOC tier contributes differently to preventing, detecting, responding to, and recovering from incidents.
