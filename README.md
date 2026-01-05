@@ -60,5 +60,11 @@ Post-Incident Activity: Documentation, lessons learned, SOC workflow improvement
 This structured methodology shows how SOC teams transform raw logs into actionable intelligence—exactly what BOTSv3 is designed to teach.
 
 
+Risk and Impact Assessment
 
+The findings in this investigation highlight several high-risk security conditions commonly observed in cloud environments. API activity without MFA significantly increases the risk of credential-based compromise, particularly when access keys are exposed or reused. Similarly, publicly accessible S3 buckets introduce immediate data exposure risks, including unauthorised downloads, data tampering, and reputational damage.
+
+The identification of an endpoint running a different Windows edition than its peers may indicate inconsistent asset management or unauthorised system changes, both of which reduce an organisation’s ability to detect lateral movement or persistence.
+
+From a SOC perspective, these risks underline the importance of proactive monitoring, configuration baselines, and rapid containment procedures. Without timely detection, such issues could escalate into data breaches or prolonged compromise.
 
