@@ -121,28 +121,26 @@ This methodology mirrors how SOC analysts investigate alerts, validate findings,
 ## Guided Questions
 4.1 Question 1 – IAM Users Accessing AWS Services
 
-To identify which IAM users interacted with AWS services, AWS CloudTrail logs were analysed to extract all unique IAM usernames associated with API activity. Both successful and unsuccessful requests were included to provide a complete view of identity usage within the environment.<img width="599" height="426" alt="Screenshot 2026-01-08 123921" src="https://github.com/user-attachments/assets/fb0f30e2-1e0f-44b5-ac8d-f356c775c428" />
+o identify which IAM users interacted with AWS services, AWS CloudTrail logs were analysed within Splunk to extract all unique IAM usernames associated with API activity. Both successful and unsuccessful API calls were included to ensure a comprehensive view of identity usage across the environment.
+
+The analysis was performed by filtering CloudTrail events for userIdentity.type=IAMUser and aggregating the userIdentity.userName field. This produced a consolidated list of IAM identities that generated AWS API activity, including human users, privileged accounts, and service accounts. The results confirm that the IAM users bstoll, btun, splunk_access, and web_admin accessed AWS services during the investigation period.
+
+Identifying active IAM users is a foundational step in cloud incident investigations, as it establishes an identity baseline and enables analysts to detect anomalous access patterns, misuse of privileged accounts, or potential credential compromise. This approach reflects standard Tier 1 and Tier 2 SOC practices, where identity-based analysis is often the starting point for cloud security investigations.
+<img width="523" height="419" alt="Screenshot 2026-01-08 124303" src="https://github.com/user-attachments/assets/8600a65d-daa1-4b39-8bb4-31bd88415ed1" />
 
 
-
-This section presents the technical findings derived from the BOTSv3 guided questions. Each question addresses a specific aspect of cloud or endpoint security and demonstrates applied intrusion and anomaly analysis.
 
     Question 2 – AWS API Activity Without MFA
 
-Objective: Identify AWS API activity occurring without multi-factor authentication.
-Data Source: aws:cloudtrail
+To determine how multi-factor authentication (MFA) usage is represented within the BOTSv3 dataset, AWS CloudTrail identity context fields were examined in Splunk. By reviewing the available fields associated with userIdentity, the field userIdentity.sessionContext.attributes.mfaAuthenticated was identified. This boolean field indicates whether MFA was used during an AWS API call.
 
-Approach:
-CloudTrail events were queried while excluding interactive console logins. MFA-related fields within the authentication context were inspected to identify API requests executed without MFA.
+The investigation confirmed that this field can be reliably used to detect and alert on AWS API activity performed without MFA. Filtering or alerting on events where mfaAuthenticated=false enables SOC analysts to identify potentially risky authentication behaviour, as API calls executed without MFA significantly increase the likelihood of credential misuse or compromise.
 
-Finding:
-Multiple AWS API calls were observed where MFA was not present, indicating a weakness in authentication enforcement.
+Monitoring MFA enforcement is a critical cloud security control and a common SOC detection use case. Since AWS access keys can be stolen, reused, or leaked, MFA provides an essential additional layer of protection. API activity occurring without MFA therefore represents a high-risk condition that should trigger immediate investigation or escalation within a SOC environment.
 
-SOC Relevance:
-API activity without MFA significantly increases the risk of credential compromise and unauthorised access. In a production SOC, this would trigger high-priority alerts and immediate policy review.
+Answer: userIdentity.sessionContext.attributes.mfaAuthenticated
 
-Evidence:
-screenshots/Screenshot 2026-01-07 225610.png
+<img width="1118" height="852" alt="Screenshot 2026-01-07 225610" src="https://github.com/user-attachments/assets/bc88b041-1ad9-4ef2-a7e0-24d8817ee53c" />
 
    Question 3 – Processor Used on Web Servers
 
