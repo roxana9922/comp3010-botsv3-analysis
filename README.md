@@ -84,40 +84,40 @@ Additionally, the use of structured validation queries and documented evidence s
 ## 4 Guided Questions
 4.1 Question 1 – IAM Users Accessing AWS Services
 
-Purpose
+**Purpose** 
 The objective of this analysis was to identify all IAM users that interacted with AWS services within the Frothly environment. Both successful and unsuccessful API calls were included to establish a complete identity baseline.
 
-Method
+**Method**
 AWS CloudTrail logs were analysed in Splunk by filtering events where userIdentity.type=IAMUser. The userIdentity.userName field was aggregated to extract a unique list of IAM identities responsible for AWS API activity across the environment.
 
 <img width="523" height="419" alt="Screenshot 2026-01-08 124303" src="https://github.com/user-attachments/assets/8600a65d-daa1-4b39-8bb4-31bd88415ed1" />
 
-Result
+**Result** 
 The following IAM users were observed accessing AWS services during the investigation period:
 
-Answer: bstoll, btun, splunk_access, web_admin
+**Answer:** bstoll, btun, splunk_access, web_admin
 
-SOC Relevance
+**SOC Relevance**
 Identity-based analysis is a foundational SOC activity in cloud investigations. Establishing which IAM users are active enables analysts to detect anomalous access patterns, misuse of privileged accounts, and potential credential compromise. This activity typically forms part of Tier 1 alert triage and Tier 2 investigation workflows within a SOC.
 
 
 
   4.2.  Question 2 – AWS API Activity Without MFA
 
-Purpose
+**Purpose**
 The objective of this analysis was to identify the CloudTrail field that indicates whether multi-factor authentication (MFA) was used during AWS API activity, enabling detection of API calls performed without MFA.
 
-Method
+**Method**  
 AWS CloudTrail identity context fields were examined in Splunk by reviewing attributes associated with the userIdentity object. Particular attention was given to session context metadata that records authentication characteristics for API requests. This analysis identified the userIdentity.sessionContext.attributes.mfaAuthenticated field as the indicator of MFA usage.
 
 <img width="1118" height="852" alt="Screenshot 2026-01-07 225610" src="https://github.com/user-attachments/assets/bc88b041-1ad9-4ef2-a7e0-24d8817ee53c" />
 
-Result
+**Result** 
 The field used to determine whether MFA was applied during an AWS API call is:
 
-Answer: userIdentity.sessionContext.attributes.mfaAuthenticated
+**Answer:** userIdentity.sessionContext.attributes.mfaAuthenticated
 
-SOC Relevance
+**SOC Relevance**  
 Monitoring AWS API activity without MFA is a critical SOC detection use case. API calls executed without MFA significantly increase the risk of credential misuse, particularly if access keys are compromised or leaked. In operational SOC environments, events where mfaAuthenticated=false would typically trigger alerting, escalation, or further investigation, especially for privileged IAM users or sensitive services. Continuous monitoring of this field supports enforcement of strong identity controls and reduces the likelihood of cloud account compromise. 
 
 
@@ -125,10 +125,10 @@ Monitoring AWS API activity without MFA is a critical SOC detection use case. AP
 
 4.3. Question 3 – Processor Model Identification
 
-Purpose
+**Purpose**
 The objective of this analysis was to identify the processor model used by Frothly’s web servers in order to establish a baseline of underlying hardware characteristics within the environment.
 
-Method
+**Method**  
 Hardware telemetry within the BOTSv3 dataset was analysed by querying events with the hardware sourcetype. These events contain system specification data, including CPU details, for hosts within the infrastructure. Relevant CPU fields were examined to determine the processor model used by the web servers.
 
 Query
@@ -137,22 +137,22 @@ index=botsv3 sourcetype="hardware"
 
 <img width="1276" height="898" alt="Screenshot 2026-01-07 230237" src="https://github.com/user-attachments/assets/63ce1917-6947-49f3-9690-aceab0d190f5" />
 
-Result
+**Result** 
 The analysis showed that the web servers were consistently configured with the following processor:
 
-Answer: Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40 GHz
+**Answer:** Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40 GHz
 Observed timestamp: 20/08/2018 14:26:25
 
-SOC Relevance
+**SOC Relevance**  
 Hardware baselining is an important component of SOC asset management and incident scoping. Consistent processor configurations across servers indicate standardised builds and reduce uncertainty during investigations. Conversely, unexpected hardware deviations may suggest misconfiguration, unmanaged assets, or potential compromise. Incorporating hardware telemetry into SOC analysis enhances infrastructure visibility and supports informed response and remediation decisions.
 
 
 4.4. Questions 4–6 – S3 Bucket Public Access Misconfiguration
 
-Purpose
+**Purpose**  
 The objective of this analysis was to determine how an Amazon S3 bucket became publicly accessible, identify the IAM user responsible for the change, and establish which resource was affected.
 
-Method
+**Method** 
 AWS CloudTrail logs were analysed in Splunk to identify configuration changes related to S3 access control. Events were reviewed chronologically to isolate the initial action that enabled public access. The investigation focused on the PutBucketAcl API call, which modifies S3 bucket access control lists (ACLs).
 
 Inspection of the raw CloudTrail JSON revealed three key fields required to answer Questions 4–6:
@@ -185,18 +185,18 @@ Evidence: /evidence/Q5/BudsUsername.png
 
 Question 6 – S3 Bucket Name
 The affected S3 bucket name was identified from the requestParameters.bucketName field within the same CloudTrail event.
-Answer: frothlywebcode
+**Answer:**  frothlywebcode
 Evidence: /evidence/Q6/BucketName.png
 
-SOC Relevance
+**SOC Relevance** 
 Misconfigured S3 access controls are a common cause of cloud data exposure incidents. CloudTrail provides authoritative evidence that allows SOC analysts to determine who made a configuration change, what resource was affected, when the change occurred, and how permissions were modified. Monitoring high-risk API actions such as PutBucketAcl enables early detection of accidental or malicious misconfigurations, reducing exposure time and potential impact.
 
 
 4.5. Question 7 – File Uploaded While the S3 Bucket Was Publicly Accessible
-Purpose
+**Purpose**  
 The objective of this analysis was to determine whether the publicly accessible S3 bucket was actively used during the exposure window, thereby establishing whether the misconfiguration resulted in a confirmed security impact.
 
-Method
+**Method**  
 Amazon S3 access logs were analysed in Splunk to identify activity occurring while public access was enabled. An initial broad search of the access logs returned a high volume of events, so the analysis was refined to focus on object upload operations. Filtering was applied for PUT requests and .txt file extensions to isolate successful upload events.
 
 Query
@@ -205,13 +205,13 @@ index=botsv3 sourcetype="aws:s3accesslogs" frothlywebcode PUT txt
 
 <img width="1280" height="845" alt="Screenshot 2026-01-07 231643" src="https://github.com/user-attachments/assets/da3e0983-1828-49f6-bf08-57057591bdce" />
 
-Result
+**Result**
 The analysis confirmed that a text file was successfully uploaded to the S3 bucket while public access was enabled.
 
-Answer: OPEN_BUCKET_PLEASE_FIX.txt
+**Answer:** OPEN_BUCKET_PLEASE_FIX.txt
 Timestamp: 20/08/2018 13:02:44
 
-SOC Relevance
+**SOC Relevance** 
 This analysis reflects standard SOC impact assessment procedures following cloud storage exposure. After identifying a misconfiguration, analysts must determine whether the issue represents a theoretical risk or a confirmed security incident. Analysing access logs allows SOC teams to establish whether files were uploaded or modified, whether exposed resources were actively abused, and whether further containment or remediation actions are required.
 
 
@@ -220,10 +220,10 @@ This analysis reflects standard SOC impact assessment procedures following cloud
 
  4.6 Question 8 – Endpoint Running a Different Windows Operating System Edition
 
-Purpose
+**Purpose** 
 The objective of this analysis was to identify any Windows endpoint operating with a different OS edition than the established baseline, and to determine the fully qualified domain name (FQDN) of the anomalous system.
 
-Method
+**Method** 
 Endpoint telemetry from the winhostmon sourcetype was analysed to establish a baseline of Windows operating system editions across Frothly’s hosts. A deduplicated comparison of OS editions per host was performed to identify inconsistencies.
 Once an anomalous host was identified, a secondary query against Windows Security Event Logs was used to confirm host identity and determine the FQDN.
 
@@ -235,12 +235,12 @@ index=botsv3 host="bstoll-l" sourcetype="WinEventLog:Security"
 
 <img width="1277" height="807" alt="Screenshot 2026-01-07 233105" src="https://github.com/user-attachments/assets/767f5ab0-e097-44aa-bde6-be6cbd823f6f" />
 
-Result
+**Result**  
 The analysis revealed a single endpoint operating with a different Windows edition than the rest of the environment. While the majority of hosts were running Microsoft Windows 10 Pro, the endpoint associated with user bstoll was running Microsoft Windows 10 Enterprise.
 
-Answer: BSTOLL-L.froth.ly
+**Answer:**  BSTOLL-L.froth.ly
 
-SOC Relevance
+**SOC Relevance**  
 Operating system inconsistencies represent a significant security concern in enterprise environments. Deviations from standardised endpoint builds may indicate unmanaged devices, configuration drift, or systems that have bypassed hardening and patching controls. In more advanced attack scenarios, threat actors may intentionally alter endpoint configurations to maintain persistence or evade detection.
 
 Notably, the anomalous endpoint is associated with the same user responsible for the S3 bucket access control misconfiguration identified earlier in the investigation. From a SOC perspective, this correlation strengthens the overall incident narrative and would warrant escalation for deeper investigation into potential privilege misuse, poor security practices, or account compromise across both cloud and endpoint domains.
