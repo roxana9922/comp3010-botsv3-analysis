@@ -251,6 +251,16 @@ Baseline monitoring of endpoint operating systems is therefore a critical SOC co
 Across CloudTrail, S3 access logs, and endpoint telemetry, the investigation identifies a high-risk cloud misconfiguration (`PutBucketAcl`) that exposed the `frothlywebcode` bucket. S3 access logs confirm real-world impact via a successful upload during the exposure window (`OPEN_BUCKET_PLEASE_FIX.txt`). Endpoint baselining further highlights OS edition deviation on `BSTOLL-L`, associated with the same user implicated in the S3 ACL change, warranting escalation for deeper identity and endpoint review.
 
 
+###4.8 SOC Escalation and Response Implications
+| SOC Stage                             | Evidence Observed (BOTSv3)                                                                                    | SOC Decision & Action                                                                                           |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Tier 1 – Detection & Triage**       | CloudTrail logs showing AWS API activity without MFA and S3 permission changes (`PutBucketAcl`)               | Alert validated as suspicious cloud activity and escalated due to increased credential and data exposure risk   |
+| **Tier 2 – Investigation & Analysis** | Correlation of CloudTrail, S3 access logs, and endpoint telemetry confirming public S3 access and file upload | Incident confirmed; scope, attribution, and impact assessed across cloud and endpoint domains                   |
+| **Confirmed Impact**                  | S3 access logs showing successful upload of `OPEN_BUCKET_PLEASE_FIX.txt` during exposure window               | Incident classified as a verified security breach rather than a theoretical misconfiguration                    |
+| **Containment (Conceptual)**          | Evidence of misconfiguration and identity misuse                                                              | Recommended actions: remove public S3 ACLs, enforce MFA, rotate affected credentials, review IAM permissions    |
+| **Tier 3 – Response & Improvement**   | Findings from cloud and endpoint correlation                                                                  | Detection improvements proposed: MFA enforcement alerts, S3 ACL monitoring, endpoint baseline compliance checks |
+
+
 ## 5. Video Presentation (10 minutes)
 
 **YouTube:** 
