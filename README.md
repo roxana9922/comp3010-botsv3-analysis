@@ -247,6 +247,10 @@ Notably, the anomalous endpoint is associated with the same user responsible for
 
 Baseline monitoring of endpoint operating systems is therefore a critical SOC control for maintaining asset visibility, enforcing configuration compliance, and detecting early indicators of compromise.
 
+### 4.7 Investigation Summary (Cross-source Correlation)
+
+Across CloudTrail, S3 access logs, and endpoint telemetry, the investigation identifies a high-risk cloud misconfiguration (`PutBucketAcl`) that exposed the `frothlywebcode` bucket. S3 access logs confirm real-world impact via a successful upload during the exposure window (`OPEN_BUCKET_PLEASE_FIX.txt`). Endpoint baselining further highlights OS edition deviation on `BSTOLL-L`, associated with the same user implicated in the S3 ACL change, warranting escalation for deeper identity and endpoint review.
+
 
 ## 5. Video Presentation (10 minutes)
 
