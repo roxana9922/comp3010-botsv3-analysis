@@ -5,66 +5,16 @@ Incident analysis report for BOTSv3 using Splunk – COMP3010 Security Operation
 
 1. Introduction
 
-This report presents a professional security investigation using the Boss of the SOC v3 (BOTSv3) dataset, a realistic, multi-source security telemetry environment designed by Splunk to emulate the operations of an enterprise-level Security Operations Centre (SOC). The scenario centres on Frothly, a fictional cloud-enabled organisation whose infrastructure includes AWS cloud services, Windows endpoints, and external-facing applications. The dataset contains thousands of logs across CloudTrail, S3 access logs, endpoint monitoring, and system activity—providing a representative environment for analysing adversary behaviours using Splunk’s Search Processing Language (SPL).
+This report documents a professional Security Operations Centre (SOC)–style investigation conducted using the Boss of the SOC v3 (BOTSv3) dataset within Splunk Enterprise. BOTSv3 simulates a realistic multi-stage security incident affecting Frothly, a fictional cloud-enabled organisation operating AWS infrastructure and Windows endpoints.
 
-The objective of this investigation is to replicate SOC-level workflows by identifying suspicious AWS activity, misconfigurations, and endpoint anomalies through structured log analysis. This aligns directly with the module aims of COMP3010 by demonstrating:
+The objective of this investigation is to demonstrate practical SOC workflows by identifying cloud misconfigurations, insecure access patterns, and endpoint anomalies through structured log analysis. The work aligns with COMP3010 learning outcomes by evidencing SOC roles, incident handling methodologies, and applied intrusion analysis using Splunk’s Search Processing Language (SPL).
 
-How a SOC monitors cloud and endpoint telemetry
+The scope of this investigation focuses on:
 
-How analysts detect, triage, and investigate security alerts
+AWS CloudTrail and S3 access logs
 
-How incident handling methodologies guide evidence-based security decisions
+Windows endpoint monitoring telemetry
 
-The scope of this report is limited to the AWS-focused 200-level question set from BOTSv3, reflecting real analyst tasks such as identifying IAM misuse, detecting S3 bucket misconfigurations, analysing CloudTrail logs for privilege escalation, and correlating cloud events with endpoint host anomalies. Supporting evidence is provided through SPL queries, result snapshots, and contextual analysis explaining the impact of each finding on incident handling.
+Detection of misconfiguration, insecure authentication, and system outliers
 
-This investigation assumes a functional Splunk deployment with the BOTSv3 dataset ingested and indexed. All work reflects practical SOC analysis and adheres to professional forensic reporting standards.
-
-
-3. Methodology and SPL Investigation Approach
-
-The investigation followed a structured, hypothesis-driven SOC analysis workflow. Rather than relying on single queries, each finding was validated through iterative SPL refinement and cross-source correlation.
-
-For AWS-related analysis, CloudTrail logs (aws:cloudtrail) were used as the primary source to identify IAM activity, API calls without MFA, and S3 access control changes. SPL searches were constructed to filter by eventName, userIdentity fields, and error codes to distinguish successful versus unsuccessful actions. Where necessary, console login events were excluded to reduce noise and focus on programmatic access risks.
-
-S3 access logs (aws:s3:accesslogs) were then correlated with CloudTrail findings to confirm whether misconfigurations led to real data exposure, such as successful object uploads during periods of public access. HTTP status codes and request types were used to validate outcomes.
-
-Endpoint analysis leveraged winhostmon and hardware-related source types to identify host-level anomalies. Aggregation functions and comparative statistics were applied to detect deviations in operating system editions across endpoints, allowing identification of an outlier host by FQDN.
-
-This approach reflects professional SOC investigation practice, where alerts are treated as starting points and conclusions are only drawn after corroborating evidence across multiple telemetry sources.
-2. SOC Roles & Incident Handling Reflection
-
-Security Operations Centres (SOCs) operate through a tiered model that enables efficient detection, investigation and escalation of security events. In a real environment—mirrored by the BOTSv3 scenario—each SOC tier contributes differently to preventing, detecting, responding to, and recovering from incidents.
-
-Tier 1 – Alert Monitoring
-Tier 1 analysts perform initial triage by monitoring dashboards and automated alerts. In the context of BOTSv3, they would identify unusual AWS CloudTrail events such as unauthorised IAM access, API calls without MFA, or sudden S3 bucket ACL changes. Their responsibility is to classify severity, escalate suspicious activity, and ensure continuous situational awareness.
-
-Tier 2 – Incident Investigation
-Tier 2 analysts conduct deeper forensic investigation using Splunk SPL queries. They correlate logs across AWS CloudTrail, S3 access logs, and Windows endpoint telemetry. In this coursework, the AWS 200-level questions reflect Tier 2 duties: identifying the IAM user responsible, determining which S3 bucket became public, analysing uploaded object metadata, and linking cloud events with endpoint host anomalies.
-
-Tier 3 – Threat Hunting & Advanced Response
-Tier 3 analysts validate whether the activity is part of a broader attack lifecycle, map findings to the MITRE ATT&CK framework, and recommend long-term mitigation. For BOTSv3, this includes evaluating whether public S3 buckets introduce exfiltration paths, detecting potential credential compromise, and determining whether unusual Windows OS variations indicate persistence techniques.
-
-Incident Handling Methodology (NIST 800-61)
-This investigation follows the NIST incident response lifecycle:
-
-Preparation: Splunk installation, dataset ingestion, account configuration
-
-Detection & Analysis: Identifying anomalies in CloudTrail and endpoint logs
-
-Containment: Addressing misconfigured buckets, revoking IAM keys
-
-Eradication & Recovery: Enforcing MFA, IAM least privilege, secure ACLs
-
-Post-Incident Activity: Documentation, lessons learned, SOC workflow improvements
-
-This structured methodology shows how SOC teams transform raw logs into actionable intelligence—exactly what BOTSv3 is designed to teach.
-
-
-Risk and Impact Assessment
-
-The findings in this investigation highlight several high-risk security conditions commonly observed in cloud environments. API activity without MFA significantly increases the risk of credential-based compromise, particularly when access keys are exposed or reused. Similarly, publicly accessible S3 buckets introduce immediate data exposure risks, including unauthorised downloads, data tampering, and reputational damage.
-
-The identification of an endpoint running a different Windows edition than its peers may indicate inconsistent asset management or unauthorised system changes, both of which reduce an organisation’s ability to detect lateral movement or persistence.
-
-From a SOC perspective, these risks underline the importance of proactive monitoring, configuration baselines, and rapid containment procedures. Without timely detection, such issues could escalate into data breaches or prolonged compromise.
-
+All findings are supported by reproducible SPL queries and screenshots.
