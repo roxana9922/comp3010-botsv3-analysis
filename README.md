@@ -75,32 +75,53 @@ This validation phase reflects standard SOC operational practice, where analysts
 
 3.4 Justification of Setup
 
-Using a virtualised Splunk environment provides full administrative control, isolates investigative activity from live systems, and supports realistic SIEM-based workflows. Logs are centralised and normalised, allowing analysts to focus on detection, correlation, and incident analysis rather than system configuration.
+The chosen setup was designed to reflect realistic SOC operational workflows while supporting accurate and efficient incident analysis. Deploying Splunk within a virtualised Ubuntu environment provides full administrative control, isolates investigative activity from production systems, and ensures a reproducible analysis environment.
 
+Using Splunk Enterprise as the SIEM platform enables centralised log collection, normalisation, and correlation across multiple data sources, including cloud and endpoint telemetry. The creation of a dedicated botsv3 index improves search performance and prevents cross-contamination with other datasets, reflecting best practice in enterprise SOC environments.
+
+Additionally, the use of structured validation queries and documented evidence screenshots supports traceability and reproducibility of findings. This approach aligns with professional SOC reporting standards, where analysts are expected to justify conclusions using verifiable evidence. Overall, the selected configuration supports the learning objectives of COMP3010 by enabling methodical, evidence-driven security analysis consistent with real-world incident response practices.
 
 ## 4 Guided Questions
 4.1 Question 1 – IAM Users Accessing AWS Services
 
-o identify which IAM users interacted with AWS services, AWS CloudTrail logs were analysed within Splunk to extract all unique IAM usernames associated with API activity. Both successful and unsuccessful API calls were included to ensure a comprehensive view of identity usage across the environment.
+Purpose
+The objective of this analysis was to identify all IAM users that interacted with AWS services within the Frothly environment. Both successful and unsuccessful API calls were included to establish a complete identity baseline.
 
-The analysis was performed by filtering CloudTrail events for userIdentity.type=IAMUser and aggregating the userIdentity.userName field. This produced a consolidated list of IAM identities that generated AWS API activity, including human users, privileged accounts, and service accounts. The results confirm that the IAM users bstoll, btun, splunk_access, and web_admin accessed AWS services during the investigation period.
+Method
+AWS CloudTrail logs were analysed in Splunk by filtering events where userIdentity.type=IAMUser. The userIdentity.userName field was aggregated to extract a unique list of IAM identities responsible for AWS API activity across the environment.
 
-Identifying active IAM users is a foundational step in cloud incident investigations, as it establishes an identity baseline and enables analysts to detect anomalous access patterns, misuse of privileged accounts, or potential credential compromise. This approach reflects standard Tier 1 and Tier 2 SOC practices, where identity-based analysis is often the starting point for cloud security investigations.
 <img width="523" height="419" alt="Screenshot 2026-01-08 124303" src="https://github.com/user-attachments/assets/8600a65d-daa1-4b39-8bb4-31bd88415ed1" />
+
+Result
+The following IAM users were observed accessing AWS services during the investigation period:
+
+Answer: bstoll, btun, splunk_access, web_admin
+
+SOC Relevance
+Identity-based analysis is a foundational SOC activity in cloud investigations. Establishing which IAM users are active enables analysts to detect anomalous access patterns, misuse of privileged accounts, and potential credential compromise. This activity typically forms part of Tier 1 alert triage and Tier 2 investigation workflows within a SOC.
 
 
 
   4.2.  Question 2 – AWS API Activity Without MFA
 
-To determine how multi-factor authentication (MFA) usage is represented within the BOTSv3 dataset, AWS CloudTrail identity context fields were examined in Splunk. By reviewing the available fields associated with userIdentity, the field userIdentity.sessionContext.attributes.mfaAuthenticated was identified. This boolean field indicates whether MFA was used during an AWS API call.
+Purpose
+The objective of this analysis was to identify the CloudTrail field that indicates whether multi-factor authentication (MFA) was used during AWS API activity, enabling detection of API calls performed without MFA.
 
-The investigation confirmed that this field can be reliably used to detect and alert on AWS API activity performed without MFA. Filtering or alerting on events where mfaAuthenticated=false enables SOC analysts to identify potentially risky authentication behaviour, as API calls executed without MFA significantly increase the likelihood of credential misuse or compromise.
+Method
+AWS CloudTrail identity context fields were examined in Splunk by reviewing attributes associated with the userIdentity object. Particular attention was given to session context metadata that records authentication characteristics for API requests. This analysis identified the userIdentity.sessionContext.attributes.mfaAuthenticated field as the indicator of MFA usage.
 
-Monitoring MFA enforcement is a critical cloud security control and a common SOC detection use case. Since AWS access keys can be stolen, reused, or leaked, MFA provides an essential additional layer of protection. API activity occurring without MFA therefore represents a high-risk condition that should trigger immediate investigation or escalation within a SOC environment.
+<img width="1118" height="852" alt="Screenshot 2026-01-07 225610" src="https://github.com/user-attachments/assets/bc88b041-1ad9-4ef2-a7e0-24d8817ee53c" />
+
+Result
+The field used to determine whether MFA was applied during an AWS API call is:
 
 Answer: userIdentity.sessionContext.attributes.mfaAuthenticated
 
-<img width="1118" height="852" alt="Screenshot 2026-01-07 225610" src="https://github.com/user-attachments/assets/bc88b041-1ad9-4ef2-a7e0-24d8817ee53c" />
+SOC Relevance
+Monitoring AWS API activity without MFA is a critical SOC detection use case. API calls executed without MFA significantly increase the risk of credential misuse, particularly if access keys are compromised or leaked. In operational SOC environments, events where mfaAuthenticated=false would typically trigger alerting, escalation, or further investigation, especially for privileged IAM users or sensitive services. Continuous monitoring of this field supports enforcement of strong identity controls and reduces the likelihood of cloud account compromise. 
+
+
+
 
 4.3. Question 3 – Processor Model Identification
 
