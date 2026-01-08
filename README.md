@@ -99,26 +99,9 @@ This validation step aligns with the preparation phase of incident handling, ens
 3.4 Justification of Setup
 
 Using a virtualised Splunk environment provides full administrative control, isolates investigative activity from live systems, and supports realistic SIEM-based workflows. Logs are centralised and normalised, allowing analysts to focus on detection, correlation, and incident analysis rather than system configuration.
-## 4. Methodology
-
-A structured, question-driven methodology was applied to ensure the investigation was systematic, repeatable, and aligned with SOC best practices.
-
-For each investigation task:
-
-Relevant data sources were identified based on the question context
-
-Focused SPL queries were constructed to extract security-relevant fields
-
-Findings were validated using raw event inspection
-
-Screenshots were captured to provide evidential support
-
-Where applicable, results were correlated across multiple log sources
-
-This methodology mirrors how SOC analysts investigate alerts, validate findings, and document incidents in operational environments.
 
 
-## Guided Questions
+## 4 Guided Questions
 4.1 Question 1 – IAM Users Accessing AWS Services
 
 o identify which IAM users interacted with AWS services, AWS CloudTrail logs were analysed within Splunk to extract all unique IAM usernames associated with API activity. Both successful and unsuccessful API calls were included to ensure a comprehensive view of identity usage across the environment.
@@ -159,16 +142,75 @@ Processor identification evidence is provided in /evidence/Q3/Processor.png.
 
 <img width="1276" height="898" alt="Screenshot 2026-01-07 230237" src="https://github.com/user-attachments/assets/63ce1917-6947-49f3-9690-aceab0d190f5" />
 
-    Questions 4–6 – S3 Bucket Public Access Misconfiguration
+4.4. Questions 4–6 – S3 Bucket Public Access Misconfiguration
 
-Objective: Identify the API call, user, and bucket involved in public S3 access.
-Data Source: aws:cloudtrail
+To determine how an Amazon S3 bucket became publicly accessible, AWS CloudTrail events were analysed to identify configuration changes affecting S3 access control. Events were ordered chronologically to isolate the initial misconfiguration responsible for exposing the bucket.
 
-Finding and SOC Relevance:
-A PutBucketAcl API call made by a specific IAM user resulted in public access being enabled on an S3 bucket. Public cloud storage exposure represents a critical misconfiguration that can lead to data leakage.
+The investigation focused on the PutBucketAcl API call, which modifies S3 access control lists. Examination of the raw CloudTrail JSON revealed three critical attributes required to answer Questions 4–6:
+
+Event ID, obtained from the eventID field
+
+IAM user, extracted from userIdentity.userName
+
+S3 bucket name, identified within requestParameters.bucketName
+
+This approach reflects standard SOC practice when investigating cloud misconfigurations, where analysts rely on CloudTrail logs to attribute configuration changes and assess exposure risk.
+
+SOC Relevance:
+Misconfigured S3 access control lists are a common cause of cloud data exposure incidents. CloudTrail provides authoritative evidence of:
+
+Who performed the configuration change
+
+What resource was affected
+
+When the change occurred
+
+How access permissions were altered
+
+Monitoring high-risk API actions such as PutBucketAcl enables early detection of accidental or malicious misconfigurations and reduces the window of exposure.
+
+Question 4
+
+What is the event ID of the API call that enabled public access?
+
+Query:
+index=botsv3 sourcetype="aws:cloudtrail" eventName="PutBucketAcl"
+
+Answer:
+ab45689d-69cd-41e7-8705-5350402cf7ac
+
+Timestamp:
+20/08/2018 13:01:46
 
 Evidence:
-screenshots/Screenshot 2026-01-07 230906.png
+/evidence/Q4/eventid.png
+
+Question 5
+
+What is Bud’s username?
+
+The IAM username associated with the PutBucketAcl event was extracted from the userIdentity.userName field.
+
+Answer:
+bstoll
+
+Evidence:
+/evidence/Q5/BudsUsername.png
+
+Question 6
+
+What is the name of the S3 bucket that was made publicly accessible?
+
+The affected bucket name was identified from the requestParameters.bucketName field within the same CloudTrail event.
+
+Answer:
+frothlywebcode
+
+Evidence:
+/evidence/Q6/BucketName.png
+<img width="1277" height="971" alt="Screenshot 2026-01-07 230906" src="https://github.com/user-attachments/assets/4ac38d07-9720-4489-8aa8-b235d396d256" />
+
+
 
     Question 7 – File Uploaded While Bucket Was Public
 
