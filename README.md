@@ -356,8 +356,5 @@ Overall, this investigation demonstrates how SOC analysts transform raw telemetr
 [11] SANS Institute, “SOC Tiering and Analyst Roles,” SANS White Papers, 2024. [Online]. Available: https://www.sans.org/white-papers/402/
 . Accessed: Jan. 6, 2026.
 
-[12] CrowdStrike, “Cloud Misconfigurations and Data Exposure,” CrowdStrike Blog, 2024. [Online]. Available: https://www.crowdstrike.com/blog/cloud-security-101-misconfigurations/
-. Accessed: Jan. 6, 2026.
-
-[13] Verizon, 2024 Data Breach Investigations Report, Verizon Enterprise, 2024. [Online]. Available: https://www.verizon.com/business/resources/reports/2024-dbir-data-breach-investigations-report.pdf
+[12] Verizon, 2024 Data Breach Investigations Report, Verizon Enterprise, 2024. [Online]. Available: https://www.verizon.com/business/resources/reports/2024-dbir-data-breach-investigations-report.pdf
 . Accessed: Jan. 6, 2026.
