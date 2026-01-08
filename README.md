@@ -272,39 +272,46 @@ From an operational perspective, this exercise highlights the importance of cent
 The findings reinforce several key SOC lessons: the necessity of enforcing MFA for all AWS API access, the need for continuous monitoring of high-risk cloud configuration changes, and the value of maintaining standardised endpoint builds. Implementing preventative controls such as automated alerts for PutBucketAcl events, stricter IAM privilege management, and baseline compliance monitoring would significantly reduce the likelihood and impact of similar incidents.
 
 Overall, the BOTSv3 investigation provided practical insight into real-world SOC workflows, demonstrating how disciplined incident handling, clear role separation, and data-driven analysis support effective security operations. The skills applied throughout this investigation reflect industry-standard practices and directly align with the learning objectives of COMP3010.
+## 🤖 AI Usage Declaration
+
+AI was used only for writing support (grammar and clarity).  
+All technical analysis and investigation were completed independently.
+<img width="883" height="729" alt="Screenshot 2026-01-08 211035" src="https://github.com/user-attachments/assets/1f9ad69f-5685-420d-981d-e64306e1113a" />
+
+
 
 ## 7. References
 [1] IBM, “What is a Security Operations Center (SOC)?,” IBM Security, 2024. [Online]. Available: https://www.ibm.com/think/topics/security-operations-center
-. Accessed: Jan. 6, 2026.
+. Accessed: Jan. 7, 2026.
 [2] Splunk Inc., “Boss of the SOC v3 (BOTSv3) Dataset,” Splunk GitHub, 2024. [Online]. Available: https://github.com/splunk/botsv3
-. Accessed: Jan. 6, 2026.
+. Accessed: Jan. 7, 2026.
 
 [3] Splunk Inc., “Splunk Enterprise Documentation,” Splunk Docs, 2025. [Online]. Available: https://docs.splunk.com
-. Accessed: Jan. 6, 2026.
+. Accessed: Jan. 7, 2026.
 
 [4] Canonical Ltd., “Ubuntu Desktop,” Ubuntu Documentation, 2019. [Online]. Available: https://ubuntu.com/download/desktop
-. Accessed: Jan. 6, 2026.
+. Accessed: Jan. 7, 2026.
 
 [5] Amazon Web Services, “AWS CloudTrail Documentation,” AWS Documentation, 2025. [Online]. Available: https://docs.aws.amazon.com/cloudtrail
-. Accessed: Jan. 6, 2026.
+. Accessed: Jan. 7, 2026.
 
 [6] Amazon Web Services, “Amazon GuardDuty Documentation,” AWS Documentation, 2025. [Online]. Available: https://docs.aws.amazon.com/guardduty
 . Accessed: Jan. 6, 2026.
 
 [7] Amazon Web Services, “AWS Identity and Access Management Best Practices,” AWS Documentation, 2025. [Online]. Available: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
-. Accessed: Jan. 6, 2026.
+. Accessed: Jan. 7, 2026.
 
 [8] Amazon Web Services, “How to prevent Amazon S3 buckets from being publicly accessible,” AWS Knowledge Center, 2025. [Online]. Available: https://aws.amazon.com/premiumsupport/knowledge-center/s3-bucket-public-access/
 . Accessed: Jan. 6, 2026.
 
 [9] NIST, Computer Security Incident Handling Guide (SP 800-61 Rev. 2), National Institute of Standards and Technology, 2012. [Online]. Available: https://nvlpubs.nist.gov
-. Accessed: Jan. 6, 2026.
+. Accessed: Jan. 7, 2026.
 
 [10] CREST, “Cyber Security Incident Response Guide,” CREST, 2024. [Online]. Available: https://www.crest-approved.org
-. Accessed: Jan. 6, 2026.
+. Accessed: Jan. 7, 2026.
 
 [11] SANS Institute, “SOC Tiering and Analyst Roles,” SANS White Papers, 2024. [Online]. Available: https://www.sans.org/white-papers/402/
 . Accessed: Jan. 6, 2026.
 
 [12] Verizon, 2024 Data Breach Investigations Report, Verizon Enterprise, 2024. [Online]. Available: https://www.verizon.com/business/resources/reports/2024-dbir-data-breach-investigations-report.pdf
-. Accessed: Jan. 6, 2026.
+. Accessed: Jan. 7, 2026.
