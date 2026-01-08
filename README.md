@@ -17,48 +17,29 @@ This report also reflects on SOC roles and incident handling methodologies, link
 
 ## 2. SOC Roles and Incident Handling
 
-A Security Operations Centre (SOC) operates as a layered function designed to manage high volumes of security alerts while enabling effective investigation and response. Tiered SOC structures allow analysts to focus on tasks appropriate to their expertise, improving detection accuracy and reducing analyst fatigue. As noted by the SANS Institute (2024), tiering helps organisations balance alert volume with investigative depth, ensuring incidents are escalated efficiently and handled at the appropriate level.
+A Security Operations Centre (SOC) operates through clearly defined analyst tiers and structured incident handling processes to ensure timely detection, investigation, and response to cybersecurity incidents. Each tier supports a specific stage of the incident lifecycle, enabling efficient escalation, accurate analysis, and informed decision-making within a high-volume security monitoring environment.
 
-Despite these benefits, tiered SOC models introduce operational challenges. High alert volumes can lead to alert fatigue, particularly at Tier 1, where analysts may deprioritise low-fidelity alerts and miss early indicators of compromise. Escalation gaps may occur if suspicious activity is not recognised or escalated promptly, delaying containment and increasing potential impact. Additionally, resource constraints can limit comprehensive visibility across all telemetry sources, requiring risk-based prioritisation of alerts and data sources.
+### SOC Analyst Tiers and BOTSv3 Mapping
 
-### Tier 1: Monitoring, Triage, and Escalation
+| SOC Tier | Primary Responsibilities | BOTSv3 Application |
+|---------|--------------------------|--------------------|
+| **Tier 1 – Monitoring & Triage** | Continuous monitoring of SIEM dashboards, alert validation, false positive reduction, and escalation of suspicious activity | Identification of anomalous AWS API activity, unusual S3 access events, and endpoint alerts using Splunk searches |
+| **Tier 2 – Investigation & Analysis** | In-depth investigation, multi-source correlation, root cause analysis, and impact assessment | Correlation of AWS CloudTrail logs, S3 access logs, and endpoint telemetry to reconstruct the attack timeline and assess exposure |
+| **Tier 3 – Response & Improvement** | Advanced analysis, containment planning, remediation strategy, and detection optimisation | Interpretation of investigation findings to propose IAM hardening, cloud misconfiguration alerts, and SOC detection improvements |
 
-Tier 1 analysts are responsible for continuous monitoring of SIEM dashboards and alert queues. Their primary role is rapid triage rather than deep investigation. Analysts validate alerts, review basic contextual information such as user identities, source IP addresses, and affected resources, and determine whether events require escalation.
+In the BOTSv3 investigation, Tier 1 and Tier 2 activities are most prominently represented. Initial detection and triage are achieved through Splunk-based monitoring of AWS and endpoint telemetry, while deeper analysis is performed through correlation of multiple log sources to establish a coherent incident narrative. Although active containment and eradication actions are outside the scope of the simulated environment, Tier 3 responsibilities are reflected through analytical interpretation and the formulation of security improvement recommendations.
 
-Within the BOTSv3 investigation, Tier 1 responsibilities are reflected in the identification of:
-- AWS API calls executed without multi-factor authentication (Question 2), indicating increased credential compromise risk  
-- `PutBucketAcl` events suggesting potential S3 bucket misconfiguration (Questions 4–6)  
-- Endpoint anomalies, such as a host running an unexpected Windows operating system edition (Question 8)
+### Incident Handling Lifecycle Alignment
 
-Effective Tier 1 escalation is critical to SOC maturity. Failure at this stage prevents Tier 2 analysts from performing timely root cause analysis, reducing the organisation’s ability to contain incidents quickly and minimise impact.
+| Incident Phase | BOTSv3 Evidence |
+|----------------|----------------|
+| **Detection** | Identification of AWS API activity without MFA and S3 ACL changes using Splunk searches |
+| **Analysis** | Correlation of CloudTrail, S3 access logs, and endpoint data to determine scope and impact |
+| **Containment (Conceptual)** | Identification of required actions such as removing public S3 access and enforcing MFA |
+| **Post-Incident Review** | Recommendations for improved detection logic, IAM governance, and cloud security posture |
 
-### Tier 2: Investigation, Correlation, and Response
+Overall, this investigation demonstrates how structured SOC roles and disciplined incident handling methodologies translate into effective operational workflows. By leveraging centralised visibility and query-driven analysis, SOC teams can transform raw telemetry into actionable intelligence and continuously improve detection and response capabilities.
 
-Tier 2 analysts conduct in-depth investigations of incidents escalated from Tier 1. Their work focuses on correlating multiple data sources, analysing root cause, assessing scope and impact, and recommending or executing response actions. As described by Palo Alto Networks (2024), Tier 2 analysts apply contextual data and threat intelligence to validate and fully understand security incidents.
-
-In the BOTSv3 scenario, Tier 2 responsibilities include:
-- Enumerating IAM user activity to establish identity baselines (Question 1)  
-- Identifying gaps in MFA enforcement  
-- Tracing the lifecycle of the S3 public access incident, from misconfiguration to confirmed data exposure  
-
-At this stage, analysts would typically implement containment actions such as revoking IAM credentials, correcting S3 access control lists, enforcing MFA policies, or isolating non-compliant endpoints.
-
-### Tier 3: Threat Hunting and Strategic Improvement
-
-Tier 3 analysts focus on proactive security improvement rather than reactive investigation. Their responsibilities include threat hunting, SIEM detection engineering, and long-term security posture optimisation. By analysing incident trends, Tier 3 analysts transform operational findings into durable security controls and automated detections.
-
-As highlighted by CrowdStrike (2024), Tier 3 analysts proactively search for advanced threats and assess weaknesses in existing controls. In the context of BOTSv3, this would include improving alerting for high-risk AWS API actions, strengthening cloud governance, and refining endpoint baselines to prevent similar incidents in the future.
-
-### Alignment with Incident Handling Frameworks
-
-The BOTSv3 investigation aligns closely with the NIST SP 800-61 incident handling lifecycle:
-
-- **Preparation**: Installing Splunk, ingesting the BOTSv3 dataset, and validating relevant sourcetypes  
-- **Detection and Analysis**: IAM enumeration, MFA validation, cloud misconfiguration analysis, and endpoint deviation detection  
-- **Containment and Recovery**: Conceptual removal of public S3 access, enforcement of MFA, and correction of endpoint inconsistencies  
-- **Post-Incident Activity**: Improving detection logic, strengthening governance, and refining security baselines  
-
-This alignment demonstrates how SOC analysts must pivot across identity logs, configuration changes, cloud storage access patterns, and endpoint telemetry to construct a coherent incident narrative. The investigation highlights the importance of SPL proficiency, awareness of cloud misconfiguration risks, and understanding attacker behaviour—core competencies required in a modern, cloud-centric SOC.
 
 
 
