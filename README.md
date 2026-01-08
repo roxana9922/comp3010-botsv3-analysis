@@ -247,6 +247,17 @@ Notably, the anomalous endpoint is associated with the same user responsible for
 
 Baseline monitoring of endpoint operating systems is therefore a critical SOC control for maintaining asset visibility, enforcing configuration compliance, and detecting early indicators of compromise.
 
+
+## 5. Video Presentation (10 minutes)
+
+**YouTube:** 
+In the presentation, I demonstrate:
+- Splunk environment setup confirmation and data validation
+- Key SPL queries used to answer the 200-level questions
+- Evidence review for the S3 misconfiguration and confirmed upload
+- SOC reflection: triage → investigation → containment recommendations
+
+
 ## 6. Conclusion
 
 This investigation demonstrated how a Security Operations Centre (SOC) can effectively detect, analyse, and contextualise security incidents by correlating cloud and endpoint telemetry using Splunk. Through structured analysis of the BOTSv3 dataset, multiple security weaknesses were identified, including unsafe IAM practices, AWS API activity without multi-factor authentication, a critical S3 bucket access misconfiguration, and endpoint configuration inconsistencies.
