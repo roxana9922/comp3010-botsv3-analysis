@@ -84,3 +84,12 @@ In a production environment, these findings would justify stronger governance co
 All evidence included in this repository was generated directly from Splunk Enterprise
 during hands-on analysis of the BOTSv3 dataset. Screenshots correspond directly to
 the answers submitted in the COMP3010 coursework quiz.
+
+
+
+References
+[1] Splunk Inc., “Boss of the SOC v3 (BOTS v3),” GitHub repository.
+[2] Amazon Web Services, “AWS CloudTrail log file examples,” AWS Documentation.
+[3] Amazon Web Services, “PutBucketAcl – Amazon S3 API Reference,” AWS Documentation.
+[4] Amazon Web Services, “PutObject – Amazon S3 API Reference,” AWS Documentation.
+[5] Amazon Web Services, “How to enable and monitor MFA for AWS API activity,” AWS Documentation / Knowledge Center.
