@@ -52,26 +52,26 @@ To conduct the BOTSv3 investigation, Splunk Enterprise was deployed on an Ubuntu
 During the initial setup, the Splunk license agreement was accepted, and default administrative credentials were configured. The Splunk instance was verified by confirming access to the Search & Reporting application and ensuring that search functionality was operational. This setup provided a stable foundation for ingesting and analysing large-scale security telemetry, consistent with SOC operational practices.<img width="1129" height="892" alt="Screenshot 2026-01-07 215557" src="https://github.com/user-attachments/assets/2862c3f2-19d7-4670-b43c-13f26cd9287e" />
 
 
+
 3.2 BOTSv3 Dataset Ingestion
 
 The Boss of the SOC v3 (BOTSv3) dataset was ingested into Splunk following the official dataset documentation. The dataset was extracted locally and indexed into Splunk using the predefined botsv3 index to ensure consistent querying and analysis.
 
 Once ingestion was completed, validation searches were performed to confirm that data had been indexed correctly and that expected source types were available. A broad search across the botsv3 index confirmed the presence of millions of events, indicating successful ingestion. Additional validation queries were used to identify available sourcetypes, including AWS CloudTrail logs, S3 access logs, endpoint monitoring data, DNS logs, and host-based telemetry.
 
-These validation steps are critical in a SOC environment, as incomplete or misconfigured data ingestion can lead to missed detections or inaccurate analysis. By verifying data availability and coverage before proceeding, confidence was established that subsequent investigative queries were based on reliable telemetry.<img width="940" height="675" alt="image" src="https://github.com/user-attachments/assets/883970b8-dd8d-4e64-aee0-618bd8ff8f15" />
+These validation steps are critical in a SOC environment, as incomplete or misconfigured data ingestion can lead to missed detections or inaccurate analysis. By verifying data availability and coverage before proceeding, confidence was established that subsequent investigative queries were based on reliable telemetry.<img width="1261" height="905" alt="Screenshot 2026-01-07 224817" src="https://github.com/user-attachments/assets/182f9017-5685-4a47-a79a-89cda377e588" />
+
+<img width="1223" height="965" alt="Screenshot 2026-01-07 224915" src="https://github.com/user-attachments/assets/437c80a5-8a6c-4a80-97e5-5196431c3a1d" />
 
 
 3.3 Data Validation
 
-To verify successful ingestion, the following search was executed:
+To ensure readiness for investigation, multiple exploratory searches were conducted across different data sources. These searches confirmed that key datasets required for answering the BOTSv3 guided questions were present and queryable. Endpoint-related data, AWS audit logs, and access records were all accessible within Splunk, allowing correlation across cloud and host-level activity.
 
-index=botsv3 earliest=0
+This validation phase reflects standard SOC operational practice, where analysts confirm data completeness and visibility before engaging in detailed incident analysis. With ingestion and validation completed, the environment was deemed suitable for answering the BOTSv3 200-level questions and supporting evidence-based incident investigation.
 
 <img width="1303" height="936" alt="Screenshot 2026-01-07 222615" src="https://github.com/user-attachments/assets/0f01f0d2-6351-41ef-95bd-f78798a1c898" />
 
-The search returned over 100,000 events, confirming that the dataset was correctly indexed. Several events were reviewed in raw format to ensure key fields such as host, index, and sourcetype were properly parsed. The presence of expected sourcetypes confirmed that AWS and endpoint telemetry was available for investigation.
-
-This validation step aligns with the preparation phase of incident handling, ensuring data integrity before analysis begins.
 
 3.4 Justification of Setup
 
