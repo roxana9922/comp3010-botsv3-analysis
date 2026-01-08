@@ -45,7 +45,7 @@ Overall, this investigation demonstrates how structured SOC roles and discipline
 
 ## 3. Installation and Data Preparation
 
-3.1 Splunk Setup
+### 3.1 Splunk Setup
 
 To conduct the BOTSv3 investigation, Splunk Enterprise was deployed on an Ubuntu virtual machine to simulate a SOC analysis environment. Splunk was installed using the official Splunk Enterprise installer and configured to run locally on port 8000. Following installation, the Splunk service was started successfully, and the web interface was accessed via a browser to confirm operational status.
 
@@ -53,7 +53,7 @@ During the initial setup, the Splunk license agreement was accepted, and default
 
 
 
-3.2 BOTSv3 Dataset Ingestion
+### 3.2 BOTSv3 Dataset Ingestion
 
 The Boss of the SOC v3 (BOTSv3) dataset was ingested into Splunk following the official dataset documentation. The dataset was extracted locally and indexed into Splunk using the predefined botsv3 index to ensure consistent querying and analysis.
 
@@ -64,7 +64,7 @@ These validation steps are critical in a SOC environment, as incomplete or misco
 <img width="1223" height="965" alt="Screenshot 2026-01-07 224915" src="https://github.com/user-attachments/assets/437c80a5-8a6c-4a80-97e5-5196431c3a1d" />
 
 
-3.3 Data Validation
+### 3.3 Data Validation
 
 To ensure readiness for investigation, multiple exploratory searches were conducted across different data sources. These searches confirmed that key datasets required for answering the BOTSv3 guided questions were present and queryable. Endpoint-related data, AWS audit logs, and access records were all accessible within Splunk, allowing correlation across cloud and host-level activity.
 
@@ -73,7 +73,7 @@ This validation phase reflects standard SOC operational practice, where analysts
 <img width="1303" height="936" alt="Screenshot 2026-01-07 222615" src="https://github.com/user-attachments/assets/0f01f0d2-6351-41ef-95bd-f78798a1c898" />
 
 
-3.4 Justification of Setup
+### 3.4 Justification of Setup
 
 The chosen setup was designed to reflect realistic SOC operational workflows while supporting accurate and efficient incident analysis. Deploying Splunk within a virtualised Ubuntu environment provides full administrative control, isolates investigative activity from production systems, and ensures a reproducible analysis environment.
 
