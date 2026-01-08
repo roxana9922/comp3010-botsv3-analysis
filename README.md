@@ -118,7 +118,12 @@ Where applicable, results were correlated across multiple log sources
 This methodology mirrors how SOC analysts investigate alerts, validate findings, and document incidents in operational environments.
 
 
-## 5. Guided Investigation and Results
+## Guided Questions
+4.1 Question 1 – IAM Users Accessing AWS Services
+
+To identify which IAM users interacted with AWS services, AWS CloudTrail logs were analysed to extract all unique IAM usernames associated with API activity. Both successful and unsuccessful requests were included to provide a complete view of identity usage within the environment.<img width="599" height="426" alt="Screenshot 2026-01-08 123921" src="https://github.com/user-attachments/assets/fb0f30e2-1e0f-44b5-ac8d-f356c775c428" />
+
+
 
 This section presents the technical findings derived from the BOTSv3 guided questions. Each question addresses a specific aspect of cloud or endpoint security and demonstrates applied intrusion and anomaly analysis.
 
