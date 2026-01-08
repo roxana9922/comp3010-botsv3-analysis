@@ -130,7 +130,7 @@ Identifying active IAM users is a foundational step in cloud incident investigat
 
 
 
-    Question 2 – AWS API Activity Without MFA
+  4.2.  Question 2 – AWS API Activity Without MFA
 
 To determine how multi-factor authentication (MFA) usage is represented within the BOTSv3 dataset, AWS CloudTrail identity context fields were examined in Splunk. By reviewing the available fields associated with userIdentity, the field userIdentity.sessionContext.attributes.mfaAuthenticated was identified. This boolean field indicates whether MFA was used during an AWS API call.
 
@@ -142,16 +142,22 @@ Answer: userIdentity.sessionContext.attributes.mfaAuthenticated
 
 <img width="1118" height="852" alt="Screenshot 2026-01-07 225610" src="https://github.com/user-attachments/assets/bc88b041-1ad9-4ef2-a7e0-24d8817ee53c" />
 
-   Question 3 – Processor Used on Web Servers
+4.3. Question 3 – Processor Model Identification
 
-Objective: Identify the processor model used on the web servers.
-Data Source: hardware
+To identify the processor model used on the web servers, the BOTSv3 dataset was queried for hardware-related telemetry. Events with the hardware sourcetype were analysed, returning system specification records for the relevant hosts. Examination of the CPU fields within these events allowed the processor model to be identified.
 
-Finding and SOC Relevance:
-Hardware inventory data allows SOC teams to understand endpoint baselines and detect abnormal configurations that may indicate unauthorised changes or unsupported systems.
+Query:
+index=botsv3 sourcetype="hardware"
+
+The analysis showed that the web servers were consistently configured with the Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40 GHz, confirmed by hardware logs recorded on 20/08/2018 at 14:26:25.
+
+SOC Relevance:
+Hardware baselining supports effective asset management and incident scoping within a SOC. Consistent processor configurations reduce uncertainty during investigations, while deviations may indicate misconfiguration, unmanaged systems, or potential compromise. Incorporating hardware telemetry into SOC analysis strengthens visibility across the infrastructure and supports informed response decisions.
 
 Evidence:
-screenshots/Screenshot 2026-01-07 230237.png
+Processor identification evidence is provided in /evidence/Q3/Processor.png.
+
+<img width="1276" height="898" alt="Screenshot 2026-01-07 230237" src="https://github.com/user-attachments/assets/63ce1917-6947-49f3-9690-aceab0d190f5" />
 
     Questions 4–6 – S3 Bucket Public Access Misconfiguration
 
