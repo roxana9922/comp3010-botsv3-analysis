@@ -82,7 +82,7 @@ This methodology mirrors how SOC analysts investigate alerts, validate findings,
 
 This section presents the technical findings derived from the BOTSv3 guided questions. Each question addresses a specific aspect of cloud or endpoint security and demonstrates applied intrusion and anomaly analysis.
 
-Question 2 – AWS API Activity Without MFA
+    Question 2 – AWS API Activity Without MFA
 
 Objective: Identify AWS API activity occurring without multi-factor authentication.
 Data Source: aws:cloudtrail
@@ -99,7 +99,7 @@ API activity without MFA significantly increases the risk of credential compromi
 Evidence:
 screenshots/Screenshot 2026-01-07 225610.png
 
-Question 3 – Processor Used on Web Servers
+   Question 3 – Processor Used on Web Servers
 
 Objective: Identify the processor model used on the web servers.
 Data Source: hardware
@@ -110,7 +110,7 @@ Hardware inventory data allows SOC teams to understand endpoint baselines and de
 Evidence:
 screenshots/Screenshot 2026-01-07 230237.png
 
-Questions 4–6 – S3 Bucket Public Access Misconfiguration
+    Questions 4–6 – S3 Bucket Public Access Misconfiguration
 
 Objective: Identify the API call, user, and bucket involved in public S3 access.
 Data Source: aws:cloudtrail
@@ -121,7 +121,7 @@ A PutBucketAcl API call made by a specific IAM user resulted in public access be
 Evidence:
 screenshots/Screenshot 2026-01-07 230906.png
 
-Question 7 – File Uploaded While Bucket Was Public
+    Question 7 – File Uploaded While Bucket Was Public
 
 Objective: Identify files uploaded while the S3 bucket was publicly accessible.
 Data Source: aws:s3:accesslogs
@@ -132,7 +132,7 @@ A text file was successfully uploaded during the window of public access, demons
 Evidence:
 screenshots/Screenshot 2026-01-07 231643.png
 
-Question 8 – Endpoint Running a Different Windows Version
+     Question 8 – Endpoint Running a Different Windows Version
 
 Objective: Identify the endpoint running a different Windows OS edition.
 Data Source: winhostmon
@@ -152,22 +152,26 @@ This investigation demonstrates how a SOC can use Splunk to detect, analyse, and
 
 Recommendations
 
-Enforce MFA for all AWS IAM users
+     Enforce MFA for all AWS IAM users
 
-Implement automated alerts for public S3 bucket access
+     Implement automated alerts for public S3 bucket access
 
-Standardise endpoint configurations to reduce monitoring gaps
+     Standardise endpoint configurations to reduce monitoring gaps
 
-Conduct regular cloud security posture reviews
+     Conduct regular cloud security posture reviews
 
 These controls would significantly strengthen detection capabilities and reduce the likelihood of future incidents.
 
 
 ## 7. References
 [1] Splunk Inc., “Boss of the SOC v3 (BOTS v3),” GitHub repository.
+
 [2] Amazon Web Services, “AWS CloudTrail log file examples,” AWS Documentation.
+
 [3] Amazon Web Services, “PutBucketAcl – Amazon S3 API Reference,” AWS Documentation.
+
 [4] Amazon Web Services, “PutObject – Amazon S3 API Reference,” AWS Documentation.
+
 [5] Amazon Web Services, “How to enable and monitor MFA for AWS API activity,” AWS Documentation / Knowledge Center.
 
 
