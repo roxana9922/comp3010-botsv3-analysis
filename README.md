@@ -6,7 +6,7 @@ Incident analysis report for BOTSv3 using Splunk – COMP3010 Security Operation
 
 ## 1. Introduction
 
-Security Operations Centres (SOCs) are responsible for continuously monitoring organisational systems, detecting security incidents, and coordinating effective responses to cyber threats. By combining skilled analysts, structured incident handling processes, and security monitoring technologies, SOCs provide organisations with situational awareness across cloud, network, and endpoint environments.
+The Security Operations Centre (SOC) monitors information systems and identifies any security threats that impact an organisation, providing coordinated responses to digital threats. With security monitoring technologies, trained analysts, and standardised incident management processes, SOCs enable organisations to maintain situational awareness across their cloud, network, and endpoint environments.
 
 This report presents an incident investigation using the Boss of the SOC v3 (BOTSv3) dataset, a realistic security simulation developed by Splunk. The dataset represents a fictional organisation named Frothly and includes a wide range of security telemetry such as AWS CloudTrail logs, S3 access logs, Windows endpoint data, and network activity. Together, these data sources simulate a complex security incident involving cloud misconfiguration and suspicious access behaviour.
 
@@ -27,7 +27,6 @@ A Security Operations Centre (SOC) operates through clearly defined analyst tier
 | **Tier 2 – Investigation & Analysis** | In-depth investigation, multi-source correlation, root cause analysis, and impact assessment | Correlation of AWS CloudTrail logs, S3 access logs, and endpoint telemetry to reconstruct the attack timeline and assess exposure |
 | **Tier 3 – Response & Improvement** | Advanced analysis, containment planning, remediation strategy, and detection optimisation | Interpretation of investigation findings to propose IAM hardening, cloud misconfiguration alerts, and SOC detection improvements |
 
-In the BOTSv3 investigation, Tier 1 and Tier 2 activities are most prominently represented. Initial detection and triage are achieved through Splunk-based monitoring of AWS and endpoint telemetry, while deeper analysis is performed through correlation of multiple log sources to establish a coherent incident narrative. Although active containment and eradication actions are outside the scope of the simulated environment, Tier 3 responsibilities are reflected through analytical interpretation and the formulation of security improvement recommendations.
 
 ### Incident Handling Lifecycle Alignment
 
@@ -38,7 +37,7 @@ In the BOTSv3 investigation, Tier 1 and Tier 2 activities are most prominently r
 | **Containment (Conceptual)** | Identification of required actions such as removing public S3 access and enforcing MFA |
 | **Post-Incident Review** | Recommendations for improved detection logic, IAM governance, and cloud security posture |
 
-Overall, this investigation demonstrates how structured SOC roles and disciplined incident handling methodologies translate into effective operational workflows. By leveraging centralised visibility and query-driven analysis, SOC teams can transform raw telemetry into actionable intelligence and continuously improve detection and response capabilities.
+Overall, this investigation shows how structured SOC roles and disciplined incident handling methodologies translate into effective operational workflows. By leveraging centralised visibility and query-driven analysis, SOC teams can transform raw telemetry into actionable intelligence and continuously improve detection and response capabilities.
 
 
 
