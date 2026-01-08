@@ -125,202 +125,140 @@ Monitoring AWS API activity without MFA is a critical SOC detection use case. AP
 
 4.3. Question 3 – Processor Model Identification
 
-To identify the processor model used on the web servers, the BOTSv3 dataset was queried for hardware-related telemetry. Events with the hardware sourcetype were analysed, returning system specification records for the relevant hosts. Examination of the CPU fields within these events allowed the processor model to be identified.
+Purpose
+The objective of this analysis was to identify the processor model used by Frothly’s web servers in order to establish a baseline of underlying hardware characteristics within the environment.
 
-Query:
+Method
+Hardware telemetry within the BOTSv3 dataset was analysed by querying events with the hardware sourcetype. These events contain system specification data, including CPU details, for hosts within the infrastructure. Relevant CPU fields were examined to determine the processor model used by the web servers.
+
+Query
+
 index=botsv3 sourcetype="hardware"
-
-The analysis showed that the web servers were consistently configured with the Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40 GHz, confirmed by hardware logs recorded on 20/08/2018 at 14:26:25.
-
-SOC Relevance:
-Hardware baselining supports effective asset management and incident scoping within a SOC. Consistent processor configurations reduce uncertainty during investigations, while deviations may indicate misconfiguration, unmanaged systems, or potential compromise. Incorporating hardware telemetry into SOC analysis strengthens visibility across the infrastructure and supports informed response decisions.
-
-Evidence:
-Processor identification evidence is provided in /evidence/Q3/Processor.png.
 
 <img width="1276" height="898" alt="Screenshot 2026-01-07 230237" src="https://github.com/user-attachments/assets/63ce1917-6947-49f3-9690-aceab0d190f5" />
 
+Result
+The analysis showed that the web servers were consistently configured with the following processor:
+
+Answer: Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40 GHz
+Observed timestamp: 20/08/2018 14:26:25
+
+SOC Relevance
+Hardware baselining is an important component of SOC asset management and incident scoping. Consistent processor configurations across servers indicate standardised builds and reduce uncertainty during investigations. Conversely, unexpected hardware deviations may suggest misconfiguration, unmanaged assets, or potential compromise. Incorporating hardware telemetry into SOC analysis enhances infrastructure visibility and supports informed response and remediation decisions.
+
+
 4.4. Questions 4–6 – S3 Bucket Public Access Misconfiguration
 
-To determine how an Amazon S3 bucket became publicly accessible, AWS CloudTrail events were analysed to identify configuration changes affecting S3 access control. Events were ordered chronologically to isolate the initial misconfiguration responsible for exposing the bucket.
+Purpose
+The objective of this analysis was to determine how an Amazon S3 bucket became publicly accessible, identify the IAM user responsible for the change, and establish which resource was affected.
 
-The investigation focused on the PutBucketAcl API call, which modifies S3 access control lists. Examination of the raw CloudTrail JSON revealed three critical attributes required to answer Questions 4–6:
+Method
+AWS CloudTrail logs were analysed in Splunk to identify configuration changes related to S3 access control. Events were reviewed chronologically to isolate the initial action that enabled public access. The investigation focused on the PutBucketAcl API call, which modifies S3 bucket access control lists (ACLs).
 
-Event ID, obtained from the eventID field
+Inspection of the raw CloudTrail JSON revealed three key fields required to answer Questions 4–6:
 
-IAM user, extracted from userIdentity.userName
+Event ID (eventID) to uniquely identify the configuration change
 
-S3 bucket name, identified within requestParameters.bucketName
+IAM username (userIdentity.userName) to attribute responsibility
 
-This approach reflects standard SOC practice when investigating cloud misconfigurations, where analysts rely on CloudTrail logs to attribute configuration changes and assess exposure risk.
+S3 bucket name (requestParameters.bucketName) to identify the affected resource
 
-SOC Relevance:
-Misconfigured S3 access control lists are a common cause of cloud data exposure incidents. CloudTrail provides authoritative evidence of:
+This approach reflects standard SOC investigative practice when analysing cloud misconfigurations, where attribution and impact assessment are derived from authoritative audit logs.
 
-Who performed the configuration change
+Query
 
-What resource was affected
-
-When the change occurred
-
-How access permissions were altered
-
-Monitoring high-risk API actions such as PutBucketAcl enables early detection of accidental or malicious misconfigurations and reduces the window of exposure.
-
-Question 4
-
-What is the event ID of the API call that enabled public access?
-
-Query:
 index=botsv3 sourcetype="aws:cloudtrail" eventName="PutBucketAcl"
 
-Answer:
-ab45689d-69cd-41e7-8705-5350402cf7ac
-
-Timestamp:
-20/08/2018 13:01:46
-
-Evidence:
-/evidence/Q4/eventid.png
-
-Question 5
-
-What is Bud’s username?
-
-The IAM username associated with the PutBucketAcl event was extracted from the userIdentity.userName field.
-
-Answer:
-bstoll
-
-Evidence:
-/evidence/Q5/BudsUsername.png
-
-Question 6
-
-What is the name of the S3 bucket that was made publicly accessible?
-
-The affected bucket name was identified from the requestParameters.bucketName field within the same CloudTrail event.
-
-Answer:
-frothlywebcode
-
-Evidence:
-/evidence/Q6/BucketName.png
 <img width="1277" height="971" alt="Screenshot 2026-01-07 230906" src="https://github.com/user-attachments/assets/4ac38d07-9720-4489-8aa8-b235d396d256" />
 
 
 
+Question 4 – Event ID of the API Call
+Answer: ab45689d-69cd-41e7-8705-5350402cf7ac
+Timestamp: 20/08/2018 13:01:46
+Evidence: /evidence/Q4/eventid.png
+
+Question 5 – IAM Username
+The IAM username associated with the PutBucketAcl event was extracted from the userIdentity.userName field.
+Answer: bstoll
+Evidence: /evidence/Q5/BudsUsername.png
+
+Question 6 – S3 Bucket Name
+The affected S3 bucket name was identified from the requestParameters.bucketName field within the same CloudTrail event.
+Answer: frothlywebcode
+Evidence: /evidence/Q6/BucketName.png
+
+SOC Relevance
+Misconfigured S3 access controls are a common cause of cloud data exposure incidents. CloudTrail provides authoritative evidence that allows SOC analysts to determine who made a configuration change, what resource was affected, when the change occurred, and how permissions were modified. Monitoring high-risk API actions such as PutBucketAcl enables early detection of accidental or malicious misconfigurations, reducing exposure time and potential impact.
+
+
 4.5. Question 7 – File Uploaded While the S3 Bucket Was Publicly Accessible
+Purpose
+The objective of this analysis was to determine whether the publicly accessible S3 bucket was actively used during the exposure window, thereby establishing whether the misconfiguration resulted in a confirmed security impact.
 
-To assess the impact of the S3 bucket misconfiguration, Amazon S3 access logs were analysed to identify activity occurring during the period when the bucket was publicly accessible. An initial broad search of the access logs returned a large volume of events, so the analysis was refined to focus specifically on object upload operations involving text files.
+Method
+Amazon S3 access logs were analysed in Splunk to identify activity occurring while public access was enabled. An initial broad search of the access logs returned a high volume of events, so the analysis was refined to focus on object upload operations. Filtering was applied for PUT requests and .txt file extensions to isolate successful upload events.
 
-Filtering the logs for PUT requests and .txt file extensions significantly reduced the dataset, allowing the relevant upload event to be isolated. Inspection of the request path confirmed that a text file was successfully uploaded to the bucket while public access was enabled.
+Query
 
-SOC Relevance:
-This approach reflects standard SOC impact assessment procedures following cloud storage exposure. After identifying a misconfiguration, analysts must determine whether:
-
-Files were uploaded or modified
-
-Data was exfiltrated
-
-The exposed resource was actively probed or abused
-
-Targeted filtering of access logs enables analysts to quickly establish whether the incident represents a theoretical risk or a confirmed security impact.
-
-Question 7
-
-What is the name of the text file that was successfully uploaded into the S3 bucket while it was publicly accessible?
-
-Query:
 index=botsv3 sourcetype="aws:s3accesslogs" frothlywebcode PUT txt
 
-Timestamp:
-20/08/2018 13:02:44
-
-Answer:
-OPEN_BUCKET_PLEASE_FIX.txt
-
-Evidence:
-/evidence/Q7/txtFile.png
 <img width="1280" height="845" alt="Screenshot 2026-01-07 231643" src="https://github.com/user-attachments/assets/da3e0983-1828-49f6-bf08-57057591bdce" />
 
- 4.6. Question 8 – Endpoint Running a Different Windows Operating System Edition
+Result
+The analysis confirmed that a text file was successfully uploaded to the S3 bucket while public access was enabled.
 
-Endpoint telemetry from the winhostmon sourcetype was analysed to establish a baseline of operating system versions across Frothly’s Windows hosts. A deduplicated view of operating system editions per host was generated to identify inconsistencies within the environment.
+Answer: OPEN_BUCKET_PLEASE_FIX.txt
+Timestamp: 20/08/2018 13:02:44
 
-This analysis revealed that one endpoint was running a different Windows edition compared to the rest of the infrastructure. While most hosts were operating on Microsoft Windows 10 Pro, the endpoint associated with user bstoll was running Microsoft Windows 10 Enterprise, indicating a deviation from the expected baseline.
+SOC Relevance
+This analysis reflects standard SOC impact assessment procedures following cloud storage exposure. After identifying a misconfiguration, analysts must determine whether the issue represents a theoretical risk or a confirmed security incident. Analysing access logs allows SOC teams to establish whether files were uploaded or modified, whether exposed resources were actively abused, and whether further containment or remediation actions are required.
 
-To confirm the identity of the anomalous system, a secondary query was performed against Windows Security Event Logs for the identified host. This allowed the fully qualified domain name (FQDN) of the endpoint to be accurately determined.
 
-Question 8
 
-What is the FQDN of the endpoint that is running a different Windows operating system edition than the others?
 
-Queries:
+
+ 4.6 Question 8 – Endpoint Running a Different Windows Operating System Edition
+
+Purpose
+The objective of this analysis was to identify any Windows endpoint operating with a different OS edition than the established baseline, and to determine the fully qualified domain name (FQDN) of the anomalous system.
+
+Method
+Endpoint telemetry from the winhostmon sourcetype was analysed to establish a baseline of Windows operating system editions across Frothly’s hosts. A deduplicated comparison of OS editions per host was performed to identify inconsistencies.
+Once an anomalous host was identified, a secondary query against Windows Security Event Logs was used to confirm host identity and determine the FQDN.
+
+Queries
 
 index=botsv3 sourcetype="winhostmon" OS="*"
-
 index=botsv3 host="bstoll-l" sourcetype="WinEventLog:Security"
-
-Answer:
-BSTOLL-L.froth.ly
-
-Evidence:
-
-/evidence/Q8/InitialSearch.png
-
-/evidence/Q8/DifferentOS.png
-
-/evidence/Q8/FQDN.png
-
-SOC Analysis
-
-Operating system inconsistencies represent a significant security concern within enterprise environments. Deviations from standardised endpoint builds may indicate unmanaged devices, configuration drift, or systems that have bypassed hardening and patching controls. In more advanced attack scenarios, threat actors may deliberately introduce or modify endpoint configurations to maintain persistence or evade detection.
-
-The fact that the anomalous endpoint is associated with the same user responsible for the S3 bucket misconfiguration strengthens the overall incident narrative. From a SOC perspective, this correlation would warrant further investigation to determine whether poor security practices, privilege misuse, or compromise contributed to multiple control failures across cloud and endpoint domains.
-
-Baseline monitoring of endpoint operating systems is therefore a critical control for maintaining visibility, enforcing compliance, and detecting early indicators of compromise.
 
 
 <img width="1277" height="807" alt="Screenshot 2026-01-07 233105" src="https://github.com/user-attachments/assets/767f5ab0-e097-44aa-bde6-be6cbd823f6f" />
 
+Result
+The analysis revealed a single endpoint operating with a different Windows edition than the rest of the environment. While the majority of hosts were running Microsoft Windows 10 Pro, the endpoint associated with user bstoll was running Microsoft Windows 10 Enterprise.
 
+Answer: BSTOLL-L.froth.ly
+
+SOC Relevance
+Operating system inconsistencies represent a significant security concern in enterprise environments. Deviations from standardised endpoint builds may indicate unmanaged devices, configuration drift, or systems that have bypassed hardening and patching controls. In more advanced attack scenarios, threat actors may intentionally alter endpoint configurations to maintain persistence or evade detection.
+
+Notably, the anomalous endpoint is associated with the same user responsible for the S3 bucket access control misconfiguration identified earlier in the investigation. From a SOC perspective, this correlation strengthens the overall incident narrative and would warrant escalation for deeper investigation into potential privilege misuse, poor security practices, or account compromise across both cloud and endpoint domains.
+
+Baseline monitoring of endpoint operating systems is therefore a critical SOC control for maintaining asset visibility, enforcing configuration compliance, and detecting early indicators of compromise.
 
 ## 6. Conclusion
 
-This investigation demonstrated a comprehensive Security Operations Centre (SOC)–level analysis using the BOTSv3 dataset within Splunk, covering AWS identity activity, cloud misconfigurations, S3 access patterns, and endpoint telemetry. By correlating multiple log sources, the analysis reconstructed a realistic incident scenario and highlighted how seemingly minor configuration errors can significantly increase organisational risk.
+This investigation demonstrated how a Security Operations Centre (SOC) can effectively detect, analyse, and contextualise security incidents by correlating cloud and endpoint telemetry using Splunk. Through structured analysis of the BOTSv3 dataset, multiple security weaknesses were identified, including unsafe IAM practices, AWS API activity without multi-factor authentication, a critical S3 bucket access misconfiguration, and endpoint configuration inconsistencies.
 
-The investigation identified a critical cloud misconfiguration in which an Amazon S3 bucket was made publicly accessible by a legitimate IAM user. During the exposure window, a text file was successfully uploaded to the bucket, and AWS GuardDuty subsequently detected a known malicious external IP probing an exposed EC2 instance. Although no evidence of deeper compromise was identified within the defined scope, these findings clearly demonstrate how misconfigurations can attract malicious attention and escalate the likelihood of attack.
+The investigation established a clear incident narrative beginning with identity-based analysis of AWS API usage, followed by the identification of a publicly accessible S3 bucket caused by an improper access control change. Subsequent analysis confirmed that the misconfiguration resulted in confirmed impact, evidenced by the successful upload of a file during the exposure window. Endpoint analysis further revealed configuration drift on a system associated with the same user responsible for the cloud misconfiguration, strengthening the case for escalation within a real SOC environment.
 
-Key lessons learned from this investigation include:
+From an operational perspective, this exercise highlights the importance of centralised logging, continuous monitoring, and effective correlation across cloud and endpoint domains. CloudTrail logs provided authoritative attribution of configuration changes, while S3 access logs and endpoint telemetry enabled impact assessment and environment-wide baselining. Together, these data sources illustrate how SOC teams can transition from alert detection to evidence-based decision-making.
 
-AWS CloudTrail is a primary forensic data source for analysing identity-centric cloud security incidents.
+The findings reinforce several key SOC lessons: the necessity of enforcing MFA for all AWS API access, the need for continuous monitoring of high-risk cloud configuration changes, and the value of maintaining standardised endpoint builds. Implementing preventative controls such as automated alerts for PutBucketAcl events, stricter IAM privilege management, and baseline compliance monitoring would significantly reduce the likelihood and impact of similar incidents.
 
-Multi-factor authentication (MFA) enforcement for API activity is critical in mitigating credential misuse and unauthorised access.
+Overall, the BOTSv3 investigation provided practical insight into real-world SOC workflows, demonstrating how disciplined incident handling, clear role separation, and data-driven analysis support effective security operations. The skills applied throughout this investigation reflect industry-standard practices and directly align with the learning objectives of COMP3010.
 
-Public S3 bucket misconfigurations remain one of the most common and impactful cloud security failures.
-
-Cross-dataset correlation between CloudTrail, S3 access logs, GuardDuty alerts, and endpoint telemetry is essential for understanding attack scope and impact.
-
-Endpoint baseline deviations, such as inconsistent operating system versions, may indicate unmanaged systems, configuration drift, or potential compromise.
-
-The incident also highlighted weaknesses in Frothly’s preventative controls. The absence of enforced MFA, insufficient IAM governance, and inconsistent endpoint configurations increased the likelihood of accidental exposure caused by human error. From a SOC perspective, these gaps represent control failures rather than isolated technical mistakes.
-
-Based on SOC incident handling methodologies aligned with Prevention, Detection, Response, and Recovery, the following recommendations are proposed:
-
-Implement automated Splunk alerts for high-risk AWS API activity, including PutBucketAcl events and API calls executed without MFA.
-
-Enforce MFA for all IAM users and API-level access without exception.
-
-Apply AWS “Block Public Access” controls to all S3 buckets by default.
-
-Standardise endpoint operating system builds and implement alerts for baseline deviations.
-
-Conduct regular IAM privilege audits to enforce least-privilege access and reduce misuse risk.
-
-Following incident containment, further actions should include reviewing the contents of affected cloud storage, scanning systems for malicious artefacts, and validating system integrity before restoring normal operations. Long-term prevention should focus on improving security awareness, reinforcing cloud security policies, and ensuring staff are trained to recognise and respond to incidents effectively.
-
-Overall, this investigation demonstrates how SOC analysts transform raw telemetry into actionable security intelligence. By combining technical analysis with operational context and structured incident handling, the report reflects the analytical depth, methodological rigor, and professional reasoning expected in real-world SOC environments.
 ## 7. References
 [1] IBM, “What is a Security Operations Center (SOC)?,” IBM Security, 2024. [Online]. Available: https://www.ibm.com/think/topics/security-operations-center
 . Accessed: Jan. 6, 2026.
