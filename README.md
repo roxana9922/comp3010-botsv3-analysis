@@ -212,58 +212,152 @@ Evidence:
 
 
 
-    Question 7 – File Uploaded While Bucket Was Public
+4.5. Question 7 – File Uploaded While the S3 Bucket Was Publicly Accessible
 
-Objective: Identify files uploaded while the S3 bucket was publicly accessible.
-Data Source: aws:s3:accesslogs
+To assess the impact of the S3 bucket misconfiguration, Amazon S3 access logs were analysed to identify activity occurring during the period when the bucket was publicly accessible. An initial broad search of the access logs returned a large volume of events, so the analysis was refined to focus specifically on object upload operations involving text files.
 
-Finding and SOC Relevance:
-A text file was successfully uploaded during the window of public access, demonstrating real exposure risk rather than a theoretical misconfiguration.
+Filtering the logs for PUT requests and .txt file extensions significantly reduced the dataset, allowing the relevant upload event to be isolated. Inspection of the request path confirmed that a text file was successfully uploaded to the bucket while public access was enabled.
+
+SOC Relevance:
+This approach reflects standard SOC impact assessment procedures following cloud storage exposure. After identifying a misconfiguration, analysts must determine whether:
+
+Files were uploaded or modified
+
+Data was exfiltrated
+
+The exposed resource was actively probed or abused
+
+Targeted filtering of access logs enables analysts to quickly establish whether the incident represents a theoretical risk or a confirmed security impact.
+
+Question 7
+
+What is the name of the text file that was successfully uploaded into the S3 bucket while it was publicly accessible?
+
+Query:
+index=botsv3 sourcetype="aws:s3accesslogs" frothlywebcode PUT txt
+
+Timestamp:
+20/08/2018 13:02:44
+
+Answer:
+OPEN_BUCKET_PLEASE_FIX.txt
 
 Evidence:
-screenshots/Screenshot 2026-01-07 231643.png
+/evidence/Q7/txtFile.png
+<img width="1280" height="845" alt="Screenshot 2026-01-07 231643" src="https://github.com/user-attachments/assets/da3e0983-1828-49f6-bf08-57057591bdce" />
 
-     Question 8 – Endpoint Running a Different Windows Version
+ 4.6. Question 8 – Endpoint Running a Different Windows Operating System Edition
 
-Objective: Identify the endpoint running a different Windows OS edition.
-Data Source: winhostmon
+Endpoint telemetry from the winhostmon sourcetype was analysed to establish a baseline of operating system versions across Frothly’s Windows hosts. A deduplicated view of operating system editions per host was generated to identify inconsistencies within the environment.
 
-Finding and SOC Relevance:
-One endpoint was identified running a different Windows edition compared to other hosts. Endpoint inconsistency increases monitoring complexity and may indicate unmanaged or misconfigured systems.
+This analysis revealed that one endpoint was running a different Windows edition compared to the rest of the infrastructure. While most hosts were operating on Microsoft Windows 10 Pro, the endpoint associated with user bstoll was running Microsoft Windows 10 Enterprise, indicating a deviation from the expected baseline.
+
+To confirm the identity of the anomalous system, a secondary query was performed against Windows Security Event Logs for the identified host. This allowed the fully qualified domain name (FQDN) of the endpoint to be accurately determined.
+
+Question 8
+
+What is the FQDN of the endpoint that is running a different Windows operating system edition than the others?
+
+Queries:
+
+index=botsv3 sourcetype="winhostmon" OS="*"
+
+index=botsv3 host="bstoll-l" sourcetype="WinEventLog:Security"
+
+Answer:
+BSTOLL-L.froth.ly
 
 Evidence:
-screenshots/Screenshot 2026-01-07 233105.png
+
+/evidence/Q8/InitialSearch.png
+
+/evidence/Q8/DifferentOS.png
+
+/evidence/Q8/FQDN.png
+
+SOC Analysis
+
+Operating system inconsistencies represent a significant security concern within enterprise environments. Deviations from standardised endpoint builds may indicate unmanaged devices, configuration drift, or systems that have bypassed hardening and patching controls. In more advanced attack scenarios, threat actors may deliberately introduce or modify endpoint configurations to maintain persistence or evade detection.
+
+The fact that the anomalous endpoint is associated with the same user responsible for the S3 bucket misconfiguration strengthens the overall incident narrative. From a SOC perspective, this correlation would warrant further investigation to determine whether poor security practices, privilege misuse, or compromise contributed to multiple control failures across cloud and endpoint domains.
+
+Baseline monitoring of endpoint operating systems is therefore a critical control for maintaining visibility, enforcing compliance, and detecting early indicators of compromise.
+
+
+<img width="1277" height="807" alt="Screenshot 2026-01-07 233105" src="https://github.com/user-attachments/assets/767f5ab0-e097-44aa-bde6-be6cbd823f6f" />
 
 
 
+## 6. Conclusion
 
+This investigation demonstrated a comprehensive Security Operations Centre (SOC)–level analysis using the BOTSv3 dataset within Splunk, covering AWS identity activity, cloud misconfigurations, S3 access patterns, and endpoint telemetry. By correlating multiple log sources, the analysis reconstructed a realistic incident scenario and highlighted how seemingly minor configuration errors can significantly increase organisational risk.
 
-## 6. Conclusion and Recommendations
-This investigation demonstrates how a SOC can use Splunk to detect, analyse, and respond to cloud and endpoint security issues. By correlating AWS CloudTrail logs, S3 access logs, and Windows host telemetry, multiple security weaknesses were identified, including insecure authentication practices, public cloud storage exposure, and endpoint configuration inconsistencies.
+The investigation identified a critical cloud misconfiguration in which an Amazon S3 bucket was made publicly accessible by a legitimate IAM user. During the exposure window, a text file was successfully uploaded to the bucket, and AWS GuardDuty subsequently detected a known malicious external IP probing an exposed EC2 instance. Although no evidence of deeper compromise was identified within the defined scope, these findings clearly demonstrate how misconfigurations can attract malicious attention and escalate the likelihood of attack.
 
-Recommendations
+Key lessons learned from this investigation include:
 
-     Enforce MFA for all AWS IAM users
+AWS CloudTrail is a primary forensic data source for analysing identity-centric cloud security incidents.
 
-     Implement automated alerts for public S3 bucket access
+Multi-factor authentication (MFA) enforcement for API activity is critical in mitigating credential misuse and unauthorised access.
 
-     Standardise endpoint configurations to reduce monitoring gaps
+Public S3 bucket misconfigurations remain one of the most common and impactful cloud security failures.
 
-     Conduct regular cloud security posture reviews
+Cross-dataset correlation between CloudTrail, S3 access logs, GuardDuty alerts, and endpoint telemetry is essential for understanding attack scope and impact.
 
-These controls would significantly strengthen detection capabilities and reduce the likelihood of future incidents.
+Endpoint baseline deviations, such as inconsistent operating system versions, may indicate unmanaged systems, configuration drift, or potential compromise.
 
+The incident also highlighted weaknesses in Frothly’s preventative controls. The absence of enforced MFA, insufficient IAM governance, and inconsistent endpoint configurations increased the likelihood of accidental exposure caused by human error. From a SOC perspective, these gaps represent control failures rather than isolated technical mistakes.
 
+Based on SOC incident handling methodologies aligned with Prevention, Detection, Response, and Recovery, the following recommendations are proposed:
+
+Implement automated Splunk alerts for high-risk AWS API activity, including PutBucketAcl events and API calls executed without MFA.
+
+Enforce MFA for all IAM users and API-level access without exception.
+
+Apply AWS “Block Public Access” controls to all S3 buckets by default.
+
+Standardise endpoint operating system builds and implement alerts for baseline deviations.
+
+Conduct regular IAM privilege audits to enforce least-privilege access and reduce misuse risk.
+
+Following incident containment, further actions should include reviewing the contents of affected cloud storage, scanning systems for malicious artefacts, and validating system integrity before restoring normal operations. Long-term prevention should focus on improving security awareness, reinforcing cloud security policies, and ensuring staff are trained to recognise and respond to incidents effectively.
+
+Overall, this investigation demonstrates how SOC analysts transform raw telemetry into actionable security intelligence. By combining technical analysis with operational context and structured incident handling, the report reflects the analytical depth, methodological rigor, and professional reasoning expected in real-world SOC environments.
 ## 7. References
-[1] Splunk Inc., “Boss of the SOC v3 (BOTS v3),” GitHub repository.
+[1] IBM, “What is a Security Operations Center (SOC)?,” IBM Security, 2024. [Online]. Available: https://www.ibm.com/think/topics/security-operations-center
+. Accessed: Jan. 6, 2026.
+[2] Splunk Inc., “Boss of the SOC v3 (BOTSv3) Dataset,” Splunk GitHub, 2024. [Online]. Available: https://github.com/splunk/botsv3
+. Accessed: Jan. 6, 2026.
 
-[2] Amazon Web Services, “AWS CloudTrail log file examples,” AWS Documentation.
+[3] Splunk Inc., “Splunk Enterprise Documentation,” Splunk Docs, 2025. [Online]. Available: https://docs.splunk.com
+. Accessed: Jan. 6, 2026.
 
-[3] Amazon Web Services, “PutBucketAcl – Amazon S3 API Reference,” AWS Documentation.
+[4] Canonical Ltd., “Ubuntu Desktop,” Ubuntu Documentation, 2019. [Online]. Available: https://ubuntu.com/download/desktop
+. Accessed: Jan. 6, 2026.
 
-[4] Amazon Web Services, “PutObject – Amazon S3 API Reference,” AWS Documentation.
+[5] Amazon Web Services, “AWS CloudTrail Documentation,” AWS Documentation, 2025. [Online]. Available: https://docs.aws.amazon.com/cloudtrail
+. Accessed: Jan. 6, 2026.
 
-[5] Amazon Web Services, “How to enable and monitor MFA for AWS API activity,” AWS Documentation / Knowledge Center.
+[6] Amazon Web Services, “Amazon GuardDuty Documentation,” AWS Documentation, 2025. [Online]. Available: https://docs.aws.amazon.com/guardduty
+. Accessed: Jan. 6, 2026.
 
+[7] Amazon Web Services, “AWS Identity and Access Management Best Practices,” AWS Documentation, 2025. [Online]. Available: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+. Accessed: Jan. 6, 2026.
 
+[8] Amazon Web Services, “How to prevent Amazon S3 buckets from being publicly accessible,” AWS Knowledge Center, 2025. [Online]. Available: https://aws.amazon.com/premiumsupport/knowledge-center/s3-bucket-public-access/
+. Accessed: Jan. 6, 2026.
 
+[9] NIST, Computer Security Incident Handling Guide (SP 800-61 Rev. 2), National Institute of Standards and Technology, 2012. [Online]. Available: https://nvlpubs.nist.gov
+. Accessed: Jan. 6, 2026.
+
+[10] CREST, “Cyber Security Incident Response Guide,” CREST, 2024. [Online]. Available: https://www.crest-approved.org
+. Accessed: Jan. 6, 2026.
+
+[11] SANS Institute, “SOC Tiering and Analyst Roles,” SANS White Papers, 2024. [Online]. Available: https://www.sans.org/white-papers/402/
+. Accessed: Jan. 6, 2026.
+
+[12] CrowdStrike, “Cloud Misconfigurations and Data Exposure,” CrowdStrike Blog, 2024. [Online]. Available: https://www.crowdstrike.com/blog/cloud-security-101-misconfigurations/
+. Accessed: Jan. 6, 2026.
+
+[13] Verizon, 2024 Data Breach Investigations Report, Verizon Enterprise, 2024. [Online]. Available: https://www.verizon.com/business/resources/reports/2024-dbir-data-breach-investigations-report.pdf
+. Accessed: Jan. 6, 2026.
