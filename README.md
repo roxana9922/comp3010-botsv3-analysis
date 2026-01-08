@@ -251,7 +251,8 @@ Baseline monitoring of endpoint operating systems is therefore a critical SOC co
 Across CloudTrail, S3 access logs, and endpoint telemetry, the investigation identifies a high-risk cloud misconfiguration (`PutBucketAcl`) that exposed the `frothlywebcode` bucket. S3 access logs confirm real-world impact via a successful upload during the exposure window (`OPEN_BUCKET_PLEASE_FIX.txt`). Endpoint baselining further highlights OS edition deviation on `BSTOLL-L`, associated with the same user implicated in the S3 ACL change, warranting escalation for deeper identity and endpoint review.
 
 
-###4.8 SOC Escalation and Response Implications
+### 4.8 SOC Escalation and Response Implications
+
 | SOC Stage                             | Evidence Observed (BOTSv3)                                                                                    | SOC Decision & Action                                                                                           |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | **Tier 1 – Detection & Triage**       | CloudTrail logs showing AWS API activity without MFA and S3 permission changes (`PutBucketAcl`)               | Alert validated as suspicious cloud activity and escalated due to increased credential and data exposure risk   |
