@@ -264,7 +264,7 @@ Across CloudTrail, S3 access logs, and endpoint telemetry, the investigation ide
 
 ## 5. Video Presentation (10 minutes)
 
-**YouTube:** 
+**YouTube:** https://www.youtube.com/watch?v=LxPxBZNXL5w
 In the presentation, I demonstrate:
 - Splunk environment setup confirmation and data validation
 - Key SPL queries used to answer the 200-level questions
